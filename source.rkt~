@@ -1,0 +1,106 @@
+#lang racket
+
+(require "graph-search.rkt")
+
+(define current-state (list 3 (vector 'B 'B 'B '_ 'W 'W 'W)))
+
+(define-ruleset goat-crossing-ruleset)
+
+
+
+(define-rule goat-crossing-ruleset (B-move state)
+  (and B-next-to-free? (> (- (free-slot state) 1) -1))
+  =>
+  (move state (- (free-slot state) 1) (free-slot state)))
+(define-rule goat-crossing-ruleset (B-jump state)
+  (and B-one-from-free? (> (- (free-slot state) 2) -1))
+  =>
+  (move state (- (free-slot state) 2) (free-slot state)))
+(define-rule goat-crossing-ruleset (B-double-jump state)
+  (and B-two-from-free? (> (- (free-slot state) 3) -1))
+  =>
+  (move state (- (free-slot state) 3) (free-slot state)))
+
+
+(define-rule goat-crossing-ruleset (W-move state)
+  W-next-to-free?
+  =>
+  (move state (+ (free-slot state) 1) (free-slot state)))
+(define-rule goat-crossing-ruleset (W-jump state)
+  W-one-from-free?
+  =>
+  (move state (+ (free-slot state) 2) (free-slot state)))
+(define-rule goat-crossing-ruleset (W-double-jump state)
+  W-two-from-free?
+  =>
+  (move state (+ (free-slot state) 3) (free-slot state)))
+
+
+
+(define (B-next-to-free? state)
+  (and (> (- (free-slot state) 1) -1)
+       (eq? 'B
+            (vector-ref (locations state)
+                        (- (free-slot state) 1)))))
+(define (B-one-from-free? state)
+  (and (> (- (free-slot state) 2) -1)
+       (eq? 'B
+            (vector-ref (locations state)
+                        (- (free-slot state) 2)))))
+(define (B-two-from-free? state)
+  (and (> (- (free-slot state) 3) -1)
+       (eq? 'B
+            (vector-ref (locations state)
+                        (- (free-slot state) 3)))))
+
+
+
+
+(define (W-next-to-free? state)
+  (and (< (+ (free-slot state) 1) (vector-length (locations state)))
+       (eq? 'W
+            (vector-ref (locations state)
+                        (+ (free-slot state) 1)))))
+(define (W-one-from-free? state)
+  (and (< (+ (free-slot state) 2) (vector-length (locations state)))
+       (eq? 'W
+            (vector-ref (locations state)
+                        (+ (free-slot state) 2)))))
+(define (W-two-from-free? state)
+  (and (< (+ (free-slot state) 3) (vector-length (locations state)))
+       (eq? 'W
+            (vector-ref (locations state)
+                        (+ (free-slot state) 3)))))
+
+
+
+(define (free-slot state)
+  (car state))
+
+(define (locations state)
+  (cadr state))
+
+(define (move state source-index target-index)
+  (printf "Move: ~a to ~a~n" source-index target-index)
+  (vector-set! (locations state)
+              target-index
+              (vector-ref (locations state) source-index))
+  (list-set state source-index)
+  (printf "     ~a~n" state))
+
+
+(define (complete? current-state)
+  (define locs (locations current-state))
+  (and (= (free-slot current-state) 3)
+       (eq? (vector-ref locs 0) 'W)
+       (eq? (vector-ref locs 1) 'W)
+       (eq? (vector-ref locs 2) 'W)
+       (eq? (vector-ref locs 4) 'B)
+       (eq? (vector-ref locs 5) 'B)
+       (eq? (vector-ref locs 6) 'B)))
+
+
+(graph-search
+ goat-crossing-ruleset
+ current-state
+ complete?)
