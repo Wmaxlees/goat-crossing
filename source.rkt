@@ -5,8 +5,6 @@
 (struct goat-state (open-location goats)
   #:transparent)
 
-(define team-size 9)
-
 (define-ruleset goat-crossing-ruleset)
 
 (define (generate-start-state black white)
@@ -54,8 +52,6 @@
   =>
   (move state (+ (free-slot state) 3) (free-slot state)))
 
-
-
 (define (B-next-to-free? state)
   (and (> (- (free-slot state) 1) -1)
        (B? state (- (free-slot state) 1))))
@@ -66,9 +62,6 @@
   (and (> (- (free-slot state) 3) -1)
        (B? state (- (free-slot state) 3))))
 
-
-
-
 (define (W-next-to-free? state)
   (and (< (+ (free-slot state) 1) (vector-length (locations state)))
        (W? state (+ (free-slot state) 1))))
@@ -78,8 +71,6 @@
 (define (W-two-from-free? state)
   (and (< (+ (free-slot state) 3) (- (vector-length (locations state)) 1))
        (W? state (+ (free-slot state) 3))))
-
-
 
 (define (free-slot state)
   (goat-state-open-location state))
