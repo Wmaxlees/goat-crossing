@@ -93,7 +93,7 @@
 (define (B? state index)
   (eq? (vector-ref (locations state) index) 'B))
 
-(define (goat-problem black-goats white-goats)
+(define (goat-problem black-goats white-goats #:merge-method (merge-method 'append))
   (define start-state (generate-start-state black-goats white-goats))
   (define goal-state (generate-goal-state black-goats white-goats))
 
